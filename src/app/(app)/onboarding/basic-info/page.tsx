@@ -1,0 +1,38 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { BasicInfoForm } from "./BasicInfoForm";
+
+export default async function BasicInfoPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("name, birthdate, gender, bio, relationship_status, photo_urls")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return (
+    <section className="flex flex-col gap-6">
+      <div>
+        <h2 className="text-xl">About you</h2>
+        <p className="text-stone">
+          The basics — who you are and how you'd like to come across.
+        </p>
+      </div>
+      <BasicInfoForm
+        defaults={{
+          name: profile?.name ?? "",
+          birthdate: profile?.birthdate ?? "",
+          gender: profile?.gender ?? "",
+          bio: profile?.bio ?? "",
+          relationship_status: profile?.relationship_status ?? null,
+          photo_urls: profile?.photo_urls ?? [],
+        }}
+      />
+    </section>
+  );
+}

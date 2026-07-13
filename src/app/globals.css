@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  /* CoHome palette — warm, muted, never clinical */
+  --color-cream: #f7f2ea;
+  --color-sand: #efe7da;
+  --color-linen: #fbf8f3;
+  --color-sage: #8a9a82;
+  --color-sage-dark: #6e7f66;
+  --color-sage-light: #e4e9e0;
+  --color-terracotta: #c97d5d;
+  --color-terracotta-dark: #b06a4c;
+  --color-terracotta-light: #f3e4dc;
+  --color-charcoal: #3a3532;
+  --color-stone: #6f6760;
+  --color-mist: #d8d0c5;
+
+  --font-heading: var(--font-fraunces);
+  --font-body: var(--font-inter);
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+}
