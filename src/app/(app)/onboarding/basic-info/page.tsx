@@ -9,7 +9,7 @@ export default async function BasicInfoPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("name, birthdate, gender, bio, relationship_status, photo_urls")
+    .select("name, birthdate, gender, bio, relationship_status, photos, onboarding_completed_at")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -22,13 +22,14 @@ export default async function BasicInfoPage() {
         </p>
       </div>
       <BasicInfoForm
+        editing={profile?.onboarding_completed_at != null}
         defaults={{
           name: profile?.name ?? "",
           birthdate: profile?.birthdate ?? "",
           gender: profile?.gender ?? "",
           bio: profile?.bio ?? "",
           relationship_status: profile?.relationship_status ?? null,
-          photo_urls: profile?.photo_urls ?? [],
+          photos: profile?.photos ?? [],
         }}
       />
     </section>

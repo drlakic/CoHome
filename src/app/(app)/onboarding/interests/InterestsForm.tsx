@@ -13,9 +13,11 @@ import type { FormState } from "@/lib/validation/form";
 export function InterestsForm({
   groups,
   defaultSelected,
+  editing,
 }: {
   groups: InterestGroup[];
   defaultSelected: string[];
+  editing: boolean;
 }) {
   const [state, formAction] = useActionState<FormState, FormData>(
     saveInterests,
@@ -39,9 +41,12 @@ export function InterestsForm({
       {state?.message && (
         <p className="text-sm text-terracotta-dark">{state.message}</p>
       )}
+      {state?.success && (
+        <p className="text-sm font-medium text-sage-dark">{state.success}</p>
+      )}
 
       <div>
-        <SubmitButton>Continue</SubmitButton>
+        <SubmitButton>{editing ? "Save changes" : "Continue"}</SubmitButton>
       </div>
     </form>
   );

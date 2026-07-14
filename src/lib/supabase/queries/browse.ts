@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database, MatchStatus } from "@/lib/supabase/database.types";
+import type { Database, MatchStatus, ProfilePhoto } from "@/lib/supabase/database.types";
 import { scoreCompatibility } from "@/lib/matching/score";
 import type { CompatibilityScore } from "@/lib/matching/types";
 import { toScoringInput } from "@/lib/matching/from-db";
@@ -17,7 +17,7 @@ export interface ProfileBundle {
     | "gender"
     | "bio"
     | "relationship_status"
-    | "photo_urls"
+    | "photos"
     | "city_id"
     | "budget_min"
     | "budget_max"
@@ -31,7 +31,7 @@ export interface ProfileBundle {
   neighborhoodIds: string[];
 }
 
-const BUNDLE_SELECT = `id, name, birthdate, gender, bio, relationship_status, photo_urls,
+const BUNDLE_SELECT = `id, name, birthdate, gender, bio, relationship_status, photos,
   city_id, budget_min, budget_max, move_in_timeframe, phone_verified, id_verified,
   profile_lifestyle(*), profile_kids_custody(*), profile_interests(interest_id, interests(category)),
   profile_neighborhood_preferences(neighborhood_id)`;
@@ -43,7 +43,7 @@ interface RawBundleRow {
   gender: string | null;
   bio: string | null;
   relationship_status: ProfileRow["relationship_status"];
-  photo_urls: string[];
+  photos: ProfilePhoto[];
   city_id: string | null;
   budget_min: number | null;
   budget_max: number | null;

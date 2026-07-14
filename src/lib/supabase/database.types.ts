@@ -50,6 +50,14 @@ export type ReportReason =
   | "other";
 export type ReportStatus = "open" | "reviewed" | "dismissed" | "actioned";
 
+// One profile photo: url plus CSS object-position framing (0-100 each axis).
+// The first entry in profiles.photos is the primary photo.
+export interface ProfilePhoto {
+  url: string;
+  pos_x: number;
+  pos_y: number;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -120,7 +128,7 @@ export interface Database {
           gender: string | null;
           bio: string | null;
           relationship_status: RelationshipStatus;
-          photo_urls: string[];
+          photos: ProfilePhoto[];
           city_id: string | null;
           budget_min: number | null;
           budget_max: number | null;
@@ -140,7 +148,7 @@ export interface Database {
           gender?: string | null;
           bio?: string | null;
           relationship_status: RelationshipStatus;
-          photo_urls?: string[];
+          photos?: ProfilePhoto[];
           city_id?: string | null;
           budget_min?: number | null;
           budget_max?: number | null;
@@ -160,7 +168,7 @@ export interface Database {
           gender?: string | null;
           bio?: string | null;
           relationship_status?: RelationshipStatus;
-          photo_urls?: string[];
+          photos?: ProfilePhoto[];
           city_id?: string | null;
           budget_min?: number | null;
           budget_max?: number | null;

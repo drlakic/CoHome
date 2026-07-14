@@ -8,7 +8,11 @@ export default async function LifestylePage() {
   if (!user) redirect("/login");
 
   const [profileRes, lifestyleRes] = await Promise.all([
-    supabase.from("profiles").select("id").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("id, onboarding_completed_at")
+      .eq("id", user.id)
+      .maybeSingle(),
     supabase
       .from("profile_lifestyle")
       .select("*")
@@ -29,6 +33,7 @@ export default async function LifestylePage() {
         </p>
       </div>
       <LifestyleForm
+        editing={profileRes.data.onboarding_completed_at != null}
         defaults={{
           pets: ls?.pets ?? null,
           smoking: ls?.smoking ?? null,

@@ -1,12 +1,12 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getAge } from "@/lib/format/age";
 import { CompatibilityBadge } from "@/components/profile/CompatibilityBadge";
+import { PhotoImg } from "@/components/profile/PhotoImg";
 import type { ScoredCandidate } from "@/lib/supabase/queries/browse";
 
 export function ProfileCard({ candidate }: { candidate: ScoredCandidate }) {
   const { profile } = candidate.bundle;
-  const photo = profile.photo_urls[0];
+  const photo = profile.photos[0];
   const snippet =
     profile.bio && profile.bio.length > 120
       ? `${profile.bio.slice(0, 120).trimEnd()}…`
@@ -19,11 +19,10 @@ export function ProfileCard({ candidate }: { candidate: ScoredCandidate }) {
     >
       <div className="relative aspect-[4/3] bg-sand">
         {photo ? (
-          <Image
-            src={photo}
+          <PhotoImg
+            photo={photo}
             alt={`${profile.name}'s photo`}
             fill
-            unoptimized
             className="object-cover"
           />
         ) : (

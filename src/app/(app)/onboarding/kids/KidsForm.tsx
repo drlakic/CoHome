@@ -15,7 +15,13 @@ interface Defaults {
   roommate_kids_preference: string | null;
 }
 
-export function KidsForm({ defaults }: { defaults: Defaults }) {
+export function KidsForm({
+  defaults,
+  editing,
+}: {
+  defaults: Defaults;
+  editing: boolean;
+}) {
   const [state, formAction] = useActionState<FormState, FormData>(
     saveKids,
     null,
@@ -132,9 +138,12 @@ export function KidsForm({ defaults }: { defaults: Defaults }) {
       {state?.message && (
         <p className="text-sm text-terracotta-dark">{state.message}</p>
       )}
+      {state?.success && (
+        <p className="text-sm font-medium text-sage-dark">{state.success}</p>
+      )}
 
       <div>
-        <SubmitButton>Continue</SubmitButton>
+        <SubmitButton>{editing ? "Save changes" : "Continue"}</SubmitButton>
       </div>
     </form>
   );

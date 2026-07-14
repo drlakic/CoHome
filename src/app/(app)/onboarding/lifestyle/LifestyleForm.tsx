@@ -19,7 +19,13 @@ interface Defaults {
   shared_space_guest_policy: string;
 }
 
-export function LifestyleForm({ defaults }: { defaults: Defaults }) {
+export function LifestyleForm({
+  defaults,
+  editing,
+}: {
+  defaults: Defaults;
+  editing: boolean;
+}) {
   const [state, formAction] = useActionState<FormState, FormData>(
     saveLifestyle,
     null,
@@ -166,10 +172,13 @@ export function LifestyleForm({ defaults }: { defaults: Defaults }) {
       {state?.message && (
         <p className="text-sm text-terracotta-dark">{state.message}</p>
       )}
+      {state?.success && (
+        <p className="text-sm font-medium text-sage-dark">{state.success}</p>
+      )}
 
       <div>
-        <SubmitButton pendingLabel="Finishing up…">
-          Finish my profile
+        <SubmitButton pendingLabel={editing ? "Saving…" : "Finishing up…"}>
+          {editing ? "Save changes" : "Finish my profile"}
         </SubmitButton>
       </div>
     </form>

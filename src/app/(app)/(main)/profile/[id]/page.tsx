@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, getAuthUser } from "@/lib/supabase/server";
@@ -21,6 +20,7 @@ import {
   smokingLabels,
 } from "@/lib/format/labels";
 import { CompatibilityBadge } from "@/components/profile/CompatibilityBadge";
+import { PhotoImg } from "@/components/profile/PhotoImg";
 import { ReportBlockMenu } from "@/components/profile/ReportBlockMenu";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { expressInterest } from "./actions";
@@ -125,16 +125,15 @@ export default async function ProfileDetailPage({
         <ReportBlockMenu profileId={p.id} profileName={p.name} />
       </div>
 
-      {p.photo_urls.length > 0 && (
+      {p.photos.length > 0 && (
         <div className="flex gap-3 overflow-x-auto">
-          {p.photo_urls.map((url) => (
-            <Image
-              key={url}
-              src={url}
+          {p.photos.map((photo) => (
+            <PhotoImg
+              key={photo.url}
+              photo={photo}
               alt={`${p.name}'s photo`}
               width={280}
               height={280}
-              unoptimized
               className="h-64 w-64 flex-shrink-0 rounded-2xl object-cover"
             />
           ))}

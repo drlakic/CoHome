@@ -51,14 +51,19 @@ export async function saveLifestyle(
     };
   }
 
-  if (!state.onboardingCompletedAt) {
-    const { error: completeError } = await supabase
-      .from("profiles")
-      .update({ onboarding_completed_at: new Date().toISOString() })
-      .eq("id", user.id);
-    if (completeError) {
-      return { message: "We couldn't finish up — please try again" };
-    }
+  // Editing an already-completed profile stays here with a confirmation;
+  // finishing first-run onboarding opens up browsing.
+  if (state.onboardingCompletedAt) {
+    revalidatePath("/onboarding", "layout");
+    return { success: "Saved" };
+  }
+
+  const { error: completeError } = await supabase
+    .from("profiles")
+    .update({ onboarding_completed_at: new Date().toISOString() })
+    .eq("id", user.id);
+  if (completeError) {
+    return { message: "We couldn't finish up — please try again" };
   }
 
   revalidatePath("/onboarding", "layout");

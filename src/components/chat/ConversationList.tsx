@@ -5,12 +5,13 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MESSAGES_READ_EVENT } from "@/components/chat/UnreadBadge";
+import type { ProfilePhoto } from "@/lib/supabase/database.types";
 
 export interface ConversationRow {
   matchId: string;
   otherName: string;
   otherAge: number;
-  photoUrl: string | null;
+  photo: ProfilePhoto | null;
   preview: string | null; // last message body, null = no messages yet
   previewMine: boolean; // last message was sent by the viewer
   unread: number;
@@ -95,14 +96,17 @@ export function ConversationList({
             href={`/matches/${row.matchId}`}
             className="flex items-center gap-4 rounded-2xl bg-linen p-4 ring-1 ring-mist/60 transition-shadow hover:shadow-md"
           >
-            {row.photoUrl ? (
+            {row.photo ? (
               <Image
-                src={row.photoUrl}
+                src={row.photo.url}
                 alt={`${row.otherName}'s photo`}
                 width={56}
                 height={56}
                 unoptimized
                 className="h-14 w-14 rounded-full object-cover"
+                style={{
+                  objectPosition: `${row.photo.pos_x}% ${row.photo.pos_y}%`,
+                }}
               />
             ) : (
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sand font-heading text-xl text-stone">

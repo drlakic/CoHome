@@ -10,7 +10,7 @@ export default async function LocationPage() {
   const [profileRes, citiesRes, neighborhoodsRes, prefsRes] = await Promise.all([
     supabase
       .from("profiles")
-      .select("city_id, budget_min, budget_max, move_in_timeframe")
+      .select("city_id, budget_min, budget_max, move_in_timeframe, onboarding_completed_at")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -36,6 +36,7 @@ export default async function LocationPage() {
         </p>
       </div>
       <LocationForm
+        editing={profileRes.data.onboarding_completed_at != null}
         cities={citiesRes.data ?? []}
         neighborhoods={neighborhoodsRes.data ?? []}
         defaults={{

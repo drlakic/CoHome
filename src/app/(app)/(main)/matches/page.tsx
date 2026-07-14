@@ -27,7 +27,7 @@ export default async function MatchesPage() {
     otherIds.length > 0
       ? supabase
           .from("profiles")
-          .select("id, name, birthdate, photo_urls")
+          .select("id, name, birthdate, photos")
           .in("id", otherIds)
       : Promise.resolve({ data: [] as never[] }),
     mutual.length > 0
@@ -64,7 +64,7 @@ export default async function MatchesPage() {
         matchId: m.id,
         otherName: other.name,
         otherAge: getAge(other.birthdate),
-        photoUrl: other.photo_urls[0] ?? null,
+        photo: other.photos[0] ?? null,
         preview: last?.body ?? null,
         previewMine: last?.sender_id === user.id,
         unread: unreadByMatch.get(m.id) ?? 0,

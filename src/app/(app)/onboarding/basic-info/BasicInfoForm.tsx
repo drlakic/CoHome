@@ -6,6 +6,7 @@ import { SubmitButton } from "@/components/ui/SubmitButton";
 import { PhotoUploader } from "@/components/onboarding/PhotoUploader";
 import { saveBasicInfo } from "./actions";
 import type { FormState } from "@/lib/validation/form";
+import type { ProfilePhoto } from "@/lib/supabase/database.types";
 
 interface Defaults {
   name: string;
@@ -13,10 +14,16 @@ interface Defaults {
   gender: string;
   bio: string;
   relationship_status: string | null;
-  photo_urls: string[];
+  photos: ProfilePhoto[];
 }
 
-export function BasicInfoForm({ defaults }: { defaults: Defaults }) {
+export function BasicInfoForm({
+  defaults,
+  editing,
+}: {
+  defaults: Defaults;
+  editing: boolean;
+}) {
   const [state, formAction] = useActionState<FormState, FormData>(
     saveBasicInfo,
     null,
@@ -97,15 +104,18 @@ export function BasicInfoForm({ defaults }: { defaults: Defaults }) {
         label="Photos"
         hint="Everyday photos work best — you at the kitchen table beats a glamour shot."
       >
-        <PhotoUploader defaultUrls={defaults.photo_urls} />
+        <PhotoUploader defaultPhotos={defaults.photos} />
       </Field>
 
       {state?.message && (
         <p className="text-sm text-terracotta-dark">{state.message}</p>
       )}
+      {state?.success && (
+        <p className="text-sm font-medium text-sage-dark">{state.success}</p>
+      )}
 
       <div>
-        <SubmitButton>Continue</SubmitButton>
+        <SubmitButton>{editing ? "Save changes" : "Continue"}</SubmitButton>
       </div>
     </form>
   );

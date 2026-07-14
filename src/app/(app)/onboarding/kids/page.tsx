@@ -8,7 +8,11 @@ export default async function KidsPage() {
   if (!user) redirect("/login");
 
   const [profileRes, kidsRes] = await Promise.all([
-    supabase.from("profiles").select("id").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("id, onboarding_completed_at")
+      .eq("id", user.id)
+      .maybeSingle(),
     supabase
       .from("profile_kids_custody")
       .select("*")
@@ -29,6 +33,7 @@ export default async function KidsPage() {
         </p>
       </div>
       <KidsForm
+        editing={profileRes.data.onboarding_completed_at != null}
         defaults={{
           has_kids: kids ? kids.has_kids : null,
           num_kids: kids?.num_kids ?? null,

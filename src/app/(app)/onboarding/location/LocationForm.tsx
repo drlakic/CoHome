@@ -28,10 +28,12 @@ export function LocationForm({
   cities,
   neighborhoods,
   defaults,
+  editing,
 }: {
   cities: City[];
   neighborhoods: Neighborhood[];
   defaults: Defaults;
+  editing: boolean;
 }) {
   const [state, formAction] = useActionState<FormState, FormData>(
     saveLocation,
@@ -137,9 +139,12 @@ export function LocationForm({
       {state?.message && (
         <p className="text-sm text-terracotta-dark">{state.message}</p>
       )}
+      {state?.success && (
+        <p className="text-sm font-medium text-sage-dark">{state.success}</p>
+      )}
 
       <div>
-        <SubmitButton>Continue</SubmitButton>
+        <SubmitButton>{editing ? "Save changes" : "Continue"}</SubmitButton>
       </div>
     </form>
   );

@@ -47,6 +47,17 @@ export async function saveInterests(
     return { message: "We couldn't save those — please try again" };
   }
 
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("onboarding_completed_at")
+    .eq("id", user.id)
+    .maybeSingle();
+
   revalidatePath("/onboarding", "layout");
+  // Editing an already-completed profile stays on this step with a
+  // confirmation; first-run onboarding continues to the next step.
+  if (existingProfile?.onboarding_completed_at != null) {
+    return { success: "Saved" };
+  }
   redirect("/onboarding/kids");
 }

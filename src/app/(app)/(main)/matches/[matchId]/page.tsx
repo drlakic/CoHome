@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { getAge } from "@/lib/format/age";
 import { ChatThread } from "@/components/chat/ChatThread";
+import { PhotoImg } from "@/components/profile/PhotoImg";
 import { ReportBlockMenu } from "@/components/profile/ReportBlockMenu";
 
 export default async function ChatPage({
@@ -27,7 +27,7 @@ export default async function ChatPage({
   const otherId = match.user_a === user.id ? match.user_b : match.user_a;
   const { data: other } = await supabase
     .from("profiles")
-    .select("id, name, birthdate, photo_urls")
+    .select("id, name, birthdate, photos")
     .eq("id", otherId)
     .maybeSingle();
   if (!other) notFound(); // blocked since matching
@@ -46,13 +46,12 @@ export default async function ChatPage({
           href={`/profile/${other.id}`}
           className="flex items-center gap-3"
         >
-          {other.photo_urls[0] ? (
-            <Image
-              src={other.photo_urls[0]}
-              alt={`${other.name}'s photo`}
+          {other.photos[0] ? (
+            <PhotoImg
+              photo={other.photos[0]}
+              alt={`'s photo`}
               width={44}
               height={44}
-              unoptimized
               className="h-11 w-11 rounded-full object-cover"
             />
           ) : (

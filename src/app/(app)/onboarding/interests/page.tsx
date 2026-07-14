@@ -10,7 +10,11 @@ export default async function InterestsPage() {
   if (!user) redirect("/login");
 
   const [profileRes, catalogRes, mineRes] = await Promise.all([
-    supabase.from("profiles").select("id").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("id, onboarding_completed_at")
+      .eq("id", user.id)
+      .maybeSingle(),
     supabase.from("interests").select("id, name, category").order("name"),
     supabase
       .from("profile_interests")
@@ -38,6 +42,7 @@ export default async function InterestsPage() {
         </p>
       </div>
       <InterestsForm
+        editing={profileRes.data.onboarding_completed_at != null}
         groups={groups}
         defaultSelected={(mineRes.data ?? []).map((row) => row.interest_id)}
       />
