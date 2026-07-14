@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { inputClass } from "@/components/ui/Field";
 import { updateNotifications, deleteAccount } from "./actions";
@@ -12,9 +12,7 @@ export default async function SettingsPage({
 }) {
   const { saved, error } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase

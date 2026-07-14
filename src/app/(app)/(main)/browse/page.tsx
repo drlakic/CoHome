@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import {
   fetchProfileBundle,
   fetchScoredCandidates,
@@ -25,9 +25,7 @@ export default async function BrowsePage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const viewer = await fetchProfileBundle(supabase, user.id);
@@ -55,19 +53,25 @@ export default async function BrowsePage({
     : { data: [] };
 
   const metroCityIds = (metroCities ?? []).map((c) => c.id);
-  const { data: neighborhoods } =
+
+  // Neighborhood list (filter panel) and candidates don't depend on each
+  // other — fetch them concurrently, reusing the metro ids from above.
+  const [neighborhoodsRes, candidates] = await Promise.all([
     metroCityIds.length > 0
-      ? await supabase
+      ? supabase
           .from("neighborhoods")
           .select("id, city_id, name")
           .in("city_id", metroCityIds)
           .order("name")
-      : { data: [] };
-
-  const candidates = await fetchScoredCandidates(supabase, viewer, {
-    cityIds: selectedCityIds,
-    neighborhoodIds: selectedNeighborhoodIds,
-  });
+      : Promise.resolve({ data: [] }),
+    fetchScoredCandidates(
+      supabase,
+      viewer,
+      { cityIds: selectedCityIds, neighborhoodIds: selectedNeighborhoodIds },
+      metroCityIds,
+    ),
+  ]);
+  const neighborhoods = neighborhoodsRes.data;
 
   return (
     <section className="flex flex-col gap-6">

@@ -1,14 +1,12 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { INTEREST_CATEGORIES } from "@/lib/interests/categories";
 import type { InterestGroup } from "@/components/onboarding/InterestPicker";
 import { InterestsForm } from "./InterestsForm";
 
 export default async function InterestsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   const [profileRes, catalogRes, mineRes] = await Promise.all([

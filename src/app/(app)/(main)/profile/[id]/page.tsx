@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { fetchProfileBundle } from "@/lib/supabase/queries/browse";
 import { scoreCompatibility } from "@/lib/matching/score";
 import { toScoringInput } from "@/lib/matching/from-db";
@@ -36,9 +36,7 @@ export default async function ProfileDetailPage({
   const { reported } = await searchParams;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
   if (id === user.id) redirect("/browse");
 
@@ -54,14 +52,23 @@ export default async function ProfileDetailPage({
     toScoringInput(subject.lifestyle, subject.kids, subject.interests),
   );
 
-  // Connection state between the two of us, if any.
+  // Connection state and displayable interests are independent — fetch both
+  // concurrently.
   const [userA, userB] = user.id < id ? [user.id, id] : [id, user.id];
-  const { data: match } = await supabase
-    .from("matches")
-    .select("id, status, user_a_interested, user_b_interested")
-    .eq("user_a", userA)
-    .eq("user_b", userB)
-    .maybeSingle();
+  const [matchRes, subjectInterestsRes] = await Promise.all([
+    supabase
+      .from("matches")
+      .select("id, status, user_a_interested, user_b_interested")
+      .eq("user_a", userA)
+      .eq("user_b", userB)
+      .maybeSingle(),
+    supabase
+      .from("profile_interests")
+      .select("interests(id, name)")
+      .eq("profile_id", id),
+  ]);
+  const match = matchRes.data;
+  const subjectInterests = subjectInterestsRes.data;
 
   const iAmA = user.id === userA;
   // One-sided interest is deliberately never shown to the other person —
@@ -71,12 +78,6 @@ export default async function ProfileDetailPage({
       ? match.user_a_interested
       : match.user_b_interested
     : false;
-
-  // Shared interests for display.
-  const { data: subjectInterests } = await supabase
-    .from("profile_interests")
-    .select("interests(id, name)")
-    .eq("profile_id", id);
   const interestNames = (subjectInterests ?? [])
     .map((row) => row.interests)
     .filter((i): i is { id: string; name: string } => i != null);

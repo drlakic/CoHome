@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { getAge } from "@/lib/format/age";
 import { ChatThread } from "@/components/chat/ChatThread";
 import { ReportBlockMenu } from "@/components/profile/ReportBlockMenu";
@@ -13,9 +13,7 @@ export default async function ChatPage({
 }) {
   const { matchId } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   // RLS already scopes this to participants; double-check mutual status.

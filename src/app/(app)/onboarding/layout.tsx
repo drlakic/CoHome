@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { getOnboardingState } from "@/lib/onboarding/state";
 import { StepNav } from "@/components/onboarding/StepNav";
 
@@ -9,9 +9,7 @@ export default async function OnboardingLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
 
   // Completed profiles are NOT redirected away — these routes double as the

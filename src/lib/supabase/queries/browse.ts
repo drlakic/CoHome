@@ -104,22 +104,15 @@ export interface BrowseFilters {
   neighborhoodIds?: string[]; // candidates open to at least one of these
 }
 
-// Candidates: completed profiles anywhere in the viewer's metro area (the
-// whole region matches by default; filters narrow it), excluding the viewer
-// and anyone with a mutual or declined connection. Blocked users are already
-// invisible via RLS. Scored against the viewer and sorted best-first.
-export async function fetchScoredCandidates(
+// Every city sharing the viewer's metro area is in scope for matching.
+export async function fetchMetroCityIds(
   supabase: SupabaseClient<Database>,
-  viewer: ProfileBundle,
-  filters: BrowseFilters = {},
-): Promise<ScoredCandidate[]> {
-  if (!viewer.profile.city_id) return [];
-
-  // Every city sharing the viewer's metro area is in scope.
+  viewerCityId: string,
+): Promise<string[]> {
   const { data: viewerCity } = await supabase
     .from("cities")
     .select("metro_area")
-    .eq("id", viewer.profile.city_id)
+    .eq("id", viewerCityId)
     .single();
   if (!viewerCity) return [];
 
@@ -128,7 +121,26 @@ export async function fetchScoredCandidates(
     .select("id")
     .eq("metro_area", viewerCity.metro_area)
     .eq("is_active", true);
-  const metroCityIds = (metroCities ?? []).map((c) => c.id);
+  return (metroCities ?? []).map((c) => c.id);
+}
+
+// Candidates: completed profiles anywhere in the viewer's metro area (the
+// whole region matches by default; filters narrow it), excluding the viewer
+// and anyone with a mutual or declined connection. Blocked users are already
+// invisible via RLS. Scored against the viewer and sorted best-first.
+// Pass metroCityIds when the caller already fetched them (the browse page
+// needs them for its filter panel anyway) to avoid duplicate round trips.
+export async function fetchScoredCandidates(
+  supabase: SupabaseClient<Database>,
+  viewer: ProfileBundle,
+  filters: BrowseFilters = {},
+  metroCityIds?: string[],
+): Promise<ScoredCandidate[]> {
+  if (!viewer.profile.city_id) return [];
+
+  if (!metroCityIds) {
+    metroCityIds = await fetchMetroCityIds(supabase, viewer.profile.city_id);
+  }
 
   // City filter can only narrow within the metro, never widen past it.
   const cityIds =
